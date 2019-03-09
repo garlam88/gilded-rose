@@ -40,7 +40,6 @@ class GildedRose
   end
   
   def calculate_aged_brie_adjustment 
-    val = 0
     if @days_remaining == ON_SELL_DAYS
       if @quality != MAX_QUALITY
         val = @quality == MODERATE_QUALITY ? 2 : 1
@@ -56,11 +55,10 @@ class GildedRose
         end
       end
     end
-    return val
+    return val.nil? ? 0 : val
   end
 
    def calculate_backstage_pass_adjustment 
-     val = 0
      if @quality != MAX_QUALITY
        case @days_remaining
          when -10,0 then val = -10
@@ -69,25 +67,24 @@ class GildedRose
          when 11 then val = 1 
        end
      end
-     return val
+     return val.nil? ? 0 : val
    end
 
   def calculate_conjured_mana_adjustment
-    val = 0
     if @quality != NO_QUALITY
       case @days_remaining
         when -10, 0 then val = -4
         when 5 then val = -2
       end 
     end
-    return val
+    return val.nil? ? 0 : val
   end
 
   def calculate_normal_item_adjustment 
     if @quality > NO_QUALITY
-      return @days_remaining > ON_SELL_DAYS ? -1 : -2
+      val = @days_remaining > ON_SELL_DAYS ? -1 : -2
     end
-    return 0
+    return val.nil? ? 0 : val
   end
 
 end
