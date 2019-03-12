@@ -21,8 +21,8 @@ class GildedRose
     @quality = quality
   end
 
-  def decrease_days_remaining(val = 1)
-    @days_remaining -= val unless @name == SULFURAS
+  def decrease_days_remaining
+    @days_remaining -= 1 unless @name == SULFURAS
   end
 
   def tick
@@ -32,45 +32,47 @@ class GildedRose
 
   def update_quality
     @quality +=
-      case @name
+      case name
+        when NORMAL_ITEM then calculate_normal_item_adjustment
         when AGED_BRIE then calculate_aged_brie_adjustment 
         when BACKSTAGE_PASSES then calculate_backstage_pass_adjustment 
         when CONJURED_MANA then calculate_conjured_mana_adjustment 
-        when NORMAL_ITEM then calculate_normal_item_adjustment
         else 0
       end
   end
   
   def calculate_aged_brie_adjustment 
-    val = @days_remaining == ON_SELL_DAYS && @quality == MODERATE_QUALITY ? 2 : 1 unless @quality == MAX_QUALITY
-    val = 1 if @days_remaining == BEFORE_SELL_DAYS && @quality == MODERATE_QUALITY
-    val = 2 if @days_remaining == AFTER_SELL_DAYS unless @quality == MAX_QUALITY
-    return val.nil? ? 0 : val
+    adjustment = days_remaining == ON_SELL_DAYS && quality == MODERATE_QUALITY ? 2 : 1 unless quality == MAX_QUALITY
+    adjustment = 1 if days_remaining == BEFORE_SELL_DAYS && quality == MODERATE_QUALITY
+    adjustment = 2 if days_remaining == AFTER_SELL_DAYS unless quality == MAX_QUALITY
+    adjustment.nil? ? 0 : adjustment
   end
 
   def calculate_backstage_pass_adjustment 
-    val =
-      case @days_remaining
+    adjustment =
+      case days_remaining
         when -10, 0 then -10
         when 1, 5 then 3
         when 6, 10 then 2 
         when 11 then 1 
-      end unless @quality == MAX_QUALITY
-    return val.nil? ? 0 : val
+        else 0
+      end unless quality == MAX_QUALITY
+    adjustment.nil? ? 0 : adjustment
   end
 
   def calculate_conjured_mana_adjustment
-    val = 
-      case @days_remaining
+    adjustment = 
+      case days_remaining
         when -10, 0 then -4
         when 5 then -2
-      end unless @quality == NO_QUALITY
-    return val.nil? ? 0 : val
+        else 0
+      end unless quality == NO_QUALITY
+    adjustment.nil? ? 0 : adjustment
   end
 
   def calculate_normal_item_adjustment 
-    val = @days_remaining > ON_SELL_DAYS ? -1 : -2 unless @quality <= NO_QUALITY
-    return val.nil? ? 0 : val
+    adjustment = days_remaining > ON_SELL_DAYS ? -1 : -2 unless quality <= NO_QUALITY
+    adjustment.nil? ? 0 : adjustment
   end
 
 end
